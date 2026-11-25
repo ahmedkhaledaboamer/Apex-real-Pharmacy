@@ -1,0 +1,290 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Shield,
+  Droplets,
+  Sparkles,
+  ChevronRight,
+  CheckCircle2 } from
+'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import type { Product } from '../api/types';
+import { ProductModal } from './ProductModal';
+import { useLocale, useTranslations } from '../lib/i18n';
+import { productTeaser, productTitle } from '../lib/localize';
+import { useCategoryProducts } from '../hooks/useCatalog';
+import { PriceTag } from './shop/ProductBits';
+import { Skeleton } from './ui/Spinner';
+export function AntiAcneSection() {
+  const navigate = useNavigate();
+  const t = useTranslations('AntiAcne');
+  const locale = useLocale();
+  const [selected, setSelected] = useState<Product | null>(null);
+  // Live skin care products (category "Skin Care")
+  const { products: acneProducts, categoryId, isLoading } = useCategoryProducts('Skin Care', { limit: 8 });
+  // Map products to routine steps based on their slug
+  const getStepNumber = (slug: string) => {
+    if (/cleans|wash|soap/.test(slug)) return 1;
+    if (/gel|serum|treat|spot|cream-acne|benzoyl|salicyl/.test(slug)) return 2;
+    if (/moistur|lotion|cream|repair|hydrat/.test(slug)) return 3;
+    if (/spf|sun|protect|barrier/.test(slug)) return 4;
+    return 5;
+  };
+  // Sort products by step
+  const sortedProducts = [...acneProducts].sort(
+    (a, b) => getStepNumber(a.slug) - getStepNumber(b.slug)
+  ).slice(0, 4);
+  const faceWash = acneProducts.find((p) => getStepNumber(p.slug) === 1) ?? sortedProducts[0];
+  const steps = [
+  {
+    title: t('step1Title'),
+    desc: t('step1Desc'),
+    icon: Droplets
+  },
+  {
+    title: t('step2Title'),
+    desc: t('step2Desc'),
+    icon: Shield
+  },
+  {
+    title: t('step3Title'),
+    desc: t('step3Desc'),
+    icon: Sparkles
+  },
+  {
+    title: t('step4Title'),
+    desc: t('step4Desc'),
+    icon: CheckCircle2
+  }];
+
+  return (
+    <section className="py-24 relative overflow-hidden bg-gradient-to-b from-white to-blue-50/50">
+      {/* Clinical Background Elements */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-goldLight/5 rounded-full blur-3xl translate-x-1/3 -translate-y-1/4 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-100/40 rounded-full blur-3xl -translate-x-1/3 translate-y-1/4 pointer-events-none" />
+
+      <div className="container mx-auto px-6 md:px-12 relative z-10">
+        {/* Header & Routine Section */}
+        <div className="flex flex-col lg:flex-row gap-16 mb-20">
+          {/* Left Column: Text & Steps */}
+          <div className="lg:w-1/2 flex flex-col justify-center">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <Shield className="w-4 h-4 text-brand-goldLight" />
+              <span className="text-sm font-semibold tracking-wider text-brand-goldLight uppercase">
+                {t('eyebrow')}
+              </span>
+            </div>
+            <h2 className="font-serif text-4xl md:text-5xl font-bold text-brand-dark mb-6 leading-tight">
+              {t('titleLine1')} <br />
+              <span className="text-brand-goldLight">{t('titleLine2')}</span>
+            </h2>
+            <p className="text-gray-600 text-lg mb-10 max-w-xl leading-relaxed">
+              {t('description')}
+            </p>
+
+            {/* 4-Step Routine List */}
+            <div className="space-y-6">
+              {steps.map((step, idx) => {
+                const Icon = step.icon;
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{
+                      opacity: 0,
+                      x: -20
+                    }}
+                    whileInView={{
+                      opacity: 1,
+                      x: 0
+                    }}
+                    viewport={{
+                      once: true
+                    }}
+                    transition={{
+                      delay: idx * 0.1,
+                      duration: 0.5
+                    }}
+                    className="flex items-start gap-4">
+                    
+                    <div className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-blue-100 flex items-center justify-center shrink-0 text-brand-goldLight">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-brand-dark text-lg mb-1">
+                        {step.title}
+                      </h4>
+                      <p className="text-gray-500 text-sm">{step.desc}</p>
+                    </div>
+                  </motion.div>);
+
+              })}
+            </div>
+          </div>
+
+          {/* Right Column: Featured Hero Card */}
+          <div className="lg:w-1/2 flex justify-center items-center">
+            {isLoading && !faceWash && <Skeleton className="w-full max-w-md aspect-[4/5] rounded-[2.5rem]" />}
+            {faceWash &&
+            <motion.div
+              initial={{
+                opacity: 0,
+                scale: 0.95
+              }}
+              whileInView={{
+                opacity: 1,
+                scale: 1
+              }}
+              viewport={{
+                once: true
+              }}
+              transition={{
+                duration: 0.7
+              }}
+              className="relative w-full max-w-md">
+              
+                {/* Decorative Halos */}
+                <div className="absolute inset-0 bg-brand-goldLight/10 rounded-full blur-2xl animate-pulse" />
+
+                <div className="relative bg-white rounded-[2.5rem] p-8 shadow-xl border border-blue-50">
+                  <div className="absolute top-6 right-6 bg-blue-50 text-brand-goldLight text-xs font-bold px-3 py-1 rounded-full">
+                    {t('stepBadge')} 01
+                  </div>
+
+                  <div className="aspect-square rounded-3xl overflow-hidden mb-8 bg-blue-50/50 flex items-center justify-center p-6 relative group">
+                    <div className="absolute inset-0 bg-gradient-to-t from-brand-goldLight/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <img
+                    src={faceWash.imageCover}
+                    alt={productTitle(faceWash, locale)}
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
+                  
+                  </div>
+
+                  <h3 className="font-serif text-2xl font-bold text-brand-dark mb-3 text-center">
+                    {productTitle(faceWash, locale)}
+                  </h3>
+                  <p className="text-gray-500 text-center mb-4">
+                    {productTeaser(faceWash, locale)}
+                  </p>
+                  <div className="flex justify-center mb-6">
+                    <PriceTag product={faceWash} />
+                  </div>
+
+                  <button
+                  onClick={() => setSelected(faceWash)}
+                  className="w-full py-4 rounded-2xl bg-blue-50 text-brand-goldLight font-semibold hover:bg-brand-goldLight hover:text-white transition-colors duration-300 flex items-center justify-center gap-2">
+                  
+                    {t('learnMore')}
+                    <ChevronRight className="w-4 h-4 rtl:rotate-180" />
+                  </button>
+                </div>
+
+                {/* Floating clinical icons */}
+                <motion.div
+                animate={{
+                  y: [-10, 10, -10]
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+                className="absolute -top-6 -left-6 bg-white p-4 rounded-2xl shadow-lg border border-blue-50 text-brand-goldLight">
+                
+                  <Sparkles className="w-6 h-6" />
+                </motion.div>
+                <motion.div
+                animate={{
+                  y: [10, -10, 10]
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: 1
+                }}
+                className="absolute -bottom-6 -right-6 bg-white p-4 rounded-2xl shadow-lg border border-blue-50 text-brand-goldLight">
+                
+                  <Droplets className="w-6 h-6" />
+                </motion.div>
+              </motion.div>
+            }
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {isLoading && Array.from({ length: 4 }, (_, i) => <Skeleton key={i} className="h-96 rounded-3xl" />)}
+          {sortedProducts.map((product, index) => {
+            const stepNum = Math.min(getStepNumber(product.slug), 4);
+            return (
+              <motion.div
+                key={product._id}
+                initial={{
+                  opacity: 0,
+                  y: 20
+                }}
+                whileInView={{
+                  opacity: 1,
+                  y: 0
+                }}
+                viewport={{
+                  once: true
+                }}
+                transition={{
+                  delay: index * 0.1,
+                  duration: 0.5
+                }}
+                onClick={() => setSelected(product)}
+                className="group cursor-pointer bg-white rounded-3xl p-5 shadow-sm border border-blue-50 hover:shadow-xl hover:border-brand-goldLight/30 transition-all duration-300 flex flex-col">
+                
+                <div className="flex justify-between items-center mb-4">
+                  <span className="bg-blue-50 text-brand-goldLight text-xs font-bold px-3 py-1 rounded-full">
+                    {t('stepBadge')} 0{stepNum}
+                  </span>
+                  <Shield className="w-4 h-4 text-brand-goldLight/40 group-hover:text-brand-goldLight transition-colors" />
+                </div>
+
+                <div className="relative w-full aspect-square rounded-2xl mb-5 overflow-hidden bg-blue-50/30 flex items-center justify-center p-4">
+                  <img
+                    src={product.imageCover}
+                    alt={productTitle(product, locale)}
+                    loading="lazy"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
+                  
+                </div>
+
+                <h3 className="font-serif text-lg font-bold text-brand-dark mb-2">
+                  {productTitle(product, locale)}
+                </h3>
+                <p className="text-gray-500 text-xs mb-4 line-clamp-2 flex-grow">
+                  {productTeaser(product, locale)}
+                </p>
+                <div className="mb-3">
+                  <PriceTag product={product} />
+                </div>
+
+                <div className="flex items-center gap-1 text-brand-goldLight font-semibold text-sm mt-auto">
+                  {t('learnMore')}
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
+                </div>
+              </motion.div>);
+
+          })}
+        </div>
+
+        {/* CTA */}
+        <div className="text-center">
+          <button
+            onClick={() => navigate(categoryId ? `/categories/${categoryId}` : '/products')}
+            className="px-8 py-4 rounded-full bg-brand-goldLight text-white font-semibold shadow-lg shadow-brand-goldLight/20 hover:shadow-brand-goldLight/40 transition-all hover:-translate-y-1 inline-flex items-center gap-2">
+            
+            {t('cta')}
+            <ChevronRight className="w-5 h-5 rtl:rotate-180" />
+          </button>
+        </div>
+      </div>
+
+      <ProductModal product={selected} onClose={() => setSelected(null)} />
+    </section>);
+
+}

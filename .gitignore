@@ -1,0 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment
+.env
+!.env.example
+
+# Old images no longer used by the site (kept locally, not uploaded)
+public/images/banner/
+public/images/ant*.png
+public/images/care*.png
+public/images/hair*.png
+public/images/oil*.png
+public/images/scan*.png
+public/images/sh*.png
+public/images/sun*.png
+public/images/v1.*
+public/images/v2.*
+public/images/woman.png
+public/images/logo.png
+public/images/logo3.png
